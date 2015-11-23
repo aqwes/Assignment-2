@@ -35,29 +35,21 @@ public class GUIMutex implements ActionListener{
 	private JLabel lblStatus;		// The status of the transmission
 	private JTextArea listW;		// The write logger pane
 	private JTextArea listR;		// The read logger pane
-	private String message;
-	private CharacterBuffer<String> charBuff;
-	private Writer writer;
-	private Reader reader;
-	private char[] cArray;
-
-
+	private Controller controller;
+	
 	/**
 	 * Constructor
-	 * @param charBuff2
-	 * @param reader
-	 * @param writer
-	 * 
 	 */
-	public GUIMutex(CharacterBuffer charBuff1) {
-		this.charBuff = charBuff1;
-
+	public GUIMutex() {
 	}
 	
 	/**
 	 * Starts the application
+	 * 
+	 * @param controller
 	 */
-	public void Start() {
+	public void Start(Controller controller) {
+		this.controller = controller;
 		frame = new JFrame();
 		frame.setBounds(0, 0, 601, 482);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -140,7 +132,7 @@ public class GUIMutex implements ActionListener{
 		pnlRes = new JPanel();
 		pnlRes.setBorder(BorderFactory.createLineBorder(Color.black));
 		pnlRes.setBounds(26, 225, 75, 47);
-		pnlRes.setBackground(Color.GREEN);
+		pnlRes.setBackground(Color.WHITE);
 		pnlTest.add(pnlRes);
 		// also to this text
 		lblStatus = new JLabel("Staus goes here");
@@ -158,37 +150,60 @@ public class GUIMutex implements ActionListener{
 		btnClear.addActionListener(this);
 
 	}
+
+	public void updateWriterLogg(String c) {
+		listW.append(c + "\n");
+	}
+
+	public void updateReaderLogg(String s) {
+		listR.append(s + "\n");
+	}
+
+	public void matching(boolean match) {
+		if (match) {
+			lblStatus.setText("SUCCESS");
+			pnlRes.setBackground(Color.GREEN);
+		} else {
+			lblStatus.setText("SORRY No match");
+			pnlRes.setBackground(Color.RED);
+		}
+		btnClear.setEnabled(true);
+	}
+
+	/**
+	 * @param receivedText
+	 */
+	public void setRecText(String receivedText) {
+		lblRec.setText(receivedText);
+	}
+
+
 	public void actionPerformed(ActionEvent e) {
-
-
 		if (e.getSource() == btnRun) {
-			btnRun.setEnabled(false);
-
-			cArray = message.toCharArray();
-			for (int i = 0; i < message.length(); i++) {
-
-				StringBuilder sb = new StringBuilder();
-				sb.append(cArray[i]);
-			
-				String str = sb.toString();
-				listW.append(str);
-			}
-
-
+			lblTrans.setText(txtTrans.getText());
 			btnClear.setEnabled(true);
-
+			btnRun.setEnabled(false);
+			if (bSync.isSelected() == true) {
+				controller.BtnRun_Click(txtTrans.getText(), true);
+			} else if (bAsync.isSelected() == true) {
+				controller.BtnRun_Click(txtTrans.getText(), false);
 			}
-		if (bAsync.isSelected() == true) {
-
 		}
-		 else if (bSync.isSelected() == true) {
-
-		}
-		if (e.getSource() == btnClear) {
-			charBuff.clear();
+ else if (e.getSource() == btnClear) {
+			btnClear.setEnabled(false);
+			btnRun.setEnabled(true);
+			txtTrans.setText("");
+			pnlRes.setBackground(Color.WHITE);
+			lblStatus.setText("Staus goes here");
+			lblTrans.setText("Transmitted string goes here");
+			lblRec.setText("Received string goes here");
 			listW.setText("");
 			listR.setText("");
+
+
+
 		}
 	}
+
 
 }

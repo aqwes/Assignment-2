@@ -1,37 +1,61 @@
-import java.util.LinkedList;
+import java.util.Observable;
 
-public class CharacterBuffer<T> {
+/**
+ * This class handles the chars
+ * 
+ * @author Dennis
+ *
+ */
+public class CharacterBuffer extends Observable {
+	private char c;
+	private boolean read = true;
 
-	private LinkedList<T> buffer = new LinkedList<T>();
-	public CharacterBuffer() {
-	
-}
-	public synchronized void put(T obj) {
-		buffer.addLast(obj);
-		notifyAll();
+	/**
+	 * Regular put method
+	 * 
+	 * @param c1
+	 */
+	public void put(char c1) {
+		this.c = c1;
 	}
 
-	public synchronized T get() throws InterruptedException {
-		while (buffer.isEmpty()) {
-			System.out.println(Thread.currentThread() + " is waiting");
-			wait();
-		}
-		return buffer.removeFirst();
+	/**
+	 * Regular get method
+	 * 
+	 * @param c
+	 */
+	public char get() {
+		return c;
 	}
 
-	public synchronized void clear() {
-		buffer.clear();
+	/**
+	 * This method is used when we want to add synchronized chars
+	 * 
+	 * @param c2
+	 */
+	public void putSync(char c2) {
+
+		this.c = c2;
+		read = false;
+		setChanged();
+		notifyObservers();
+
 	}
 
-	public int size() {
-		return buffer.size();
+	public boolean read() {
+		return read;
 	}
 
-	public void putUN(T obj) {
-		buffer.addLast(obj);
+	/**
+	 * This method is used when we want to get the synchronized chars
+	 * 
+	 * @param c2
+	 */
+	public char getSyncReadWrite() {
+		read = true;
+		setChanged();
+		notifyObservers();
+		return c;
 	}
 
-	public T get1() {
-		return buffer.removeFirst();
-	}
 }
